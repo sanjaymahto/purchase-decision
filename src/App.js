@@ -372,7 +372,6 @@ renderChart = () => {
 * @param  {Array} fields - charting field array
 */
 renderChartComp = () => {
-
     // Defining variable - Canvas instance of rendered chart 
     const crosstab = this.state.chartCanvas;
 
@@ -405,15 +404,6 @@ renderChartComp = () => {
         canvasRootData: crosstabData
     })
 
-    // load data and schema from url
-    const data = DATA;
-    const schema = SCHEMA;
-
-    // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
-    let DataModel = muze.DataModel;
-    // Create an instance of DataModel using the data and schema.
-    let rootData = new DataModel(data, schema);
-
     // Create an environment for future rendering
     let env = muze();
     // Get a canvas instance from Muze where the chart will be rendered.
@@ -428,27 +418,89 @@ renderChartComp = () => {
         .detail(['Name']) // Show all the data point
         .mount(document.getElementById('compare-chart-container'));
 
-        canvas.once('canvas.updated').then(() =>{
-            canvas.composition().visualGroup.getGroupByData().on('propagation', (propValue) => {
-                const action = propValue.payload.action;
-                const data = propValue.data;
-            
-                if (action === 'brush') {
-                    // Display table using this entryModel
-                    const entryModel = data[0];
-                    console.log('entry data: ', data[0]);
-                    console.log('exit data: ', data[1]);
-                    if(document.getElementsByClassName('tableStyle')[0]){
-                        let table = document.getElementsByClassName('tableStyle')[0];
-                        table.remove();
-                        this.dataconverter(entryModel);
-                     } else {
-                        this.dataconverter(entryModel);
-                     }
-                }
-        });
+        // brush effect in SPLOM Chart
+        const SpawnableSideEffect = muze.SideEffects.standards.SpawnableSideEffect;
 
-    });
+        let selectedData = {};
+
+        const concatModels = (dm1, dm2) => {
+            const dataObj1 = dm1.getData();
+            const dataObj2 = dm2.getData();
+            const data1 = dataObj1.data;
+            const data2 = dataObj2.data;
+            const schema1 = dataObj1.schema;
+            const schema2 = dataObj2.schema;
+            const tuples1 = {};
+            const tuples2 = {};
+            const commonTuples = {};
+            for (let i = 0; i < data1.length; i++) {
+                for (let ii = 0; ii < data2.length; ii++) {
+                    const row1 = data1[i];
+                    const row2 = data2[ii];
+                    const dim1Values = row1.filter((d, idx) => schema1[idx].type === 'dimension');
+                    const dim2Values = row2.filter((d, idx) => schema2[idx].type === 'dimension');
+                    const allDimSame = dim1Values.every(value => dim2Values.indexOf(value) !== -1);
+                    if (allDimSame) {
+                        const key = dim1Values.join();
+                        !commonTuples[key] && (commonTuples[key] = {});
+                        row1.forEach((value, idx) => {
+                            commonTuples[key][schema1[idx].name] = value;
+                        });
+                        row2.forEach((value, idx) => {
+                            commonTuples[key][schema2[idx].name] = value;
+                        });
+                    } else {
+                        const dm1Key = dim1Values.join();
+                        const dm2Key = dim2Values.join();
+                        if (!commonTuples[dm1Key] && !commonTuples[dm2Key]) {
+                            !tuples1[dm1Key] && (tuples1[dm1Key] = {});
+                            !tuples2[dm2Key] && (tuples2[dm2Key] = {});
+                            row1.forEach((value, idx) => {
+                                tuples1[dm1Key][schema1[idx].name] = value;
+                            });
+                            row2.forEach((value, idx) => {
+                                tuples2[dm2Key][schema2[idx].name] = value;
+                            });
+                        }
+                    }
+                }
+            }
+    
+            const commonSchema = [...schema1, ...schema2.filter(s2 => schema1.findIndex(s1 => s1.name === s2.name) === -1)];
+            const dataArr = [...Object.values(tuples1), ...Object.values(tuples2), ...Object.values(commonTuples)];
+            return new DataModel(dataArr, commonSchema);
+        };
+    
+        const updateTableView = (selectedData) => {
+            let model = null;
+            Object.values(selectedData).forEach((dataModel) => {
+                if (model !== null) {
+                    model = concatModels(dataModel, model);
+                } else {
+                    model = dataModel;
+                }
+            });
+
+            this.dataconverter(model);
+        };
+        
+        muze.ActionModel.for(canvas)
+            .mapSideEffects({
+                brush: ['table']
+            })
+            .registerSideEffects(
+                class Table extends SpawnableSideEffect {
+                    static formalName () {
+                        return 'table';
+                    }
+                    apply (selectionSet) {
+                        const model = selectionSet.mergedEnter.model;
+                        const unitId = this.firebolt.context.id();
+                        selectedData[unitId] = model;
+                        updateTableView(selectedData);
+                    }
+                });
+
 }
 
 /**
@@ -467,6 +519,7 @@ toggleModal = () => {
 
     } else {
        $('#chart-container').hide("slide", {direction: "left" }, 1000);
+
        this.setState({
            showModal: true
        });
@@ -475,7 +528,7 @@ toggleModal = () => {
      this.clearComponent.current.resetFiltering();        
 
         //render the compare chart
-        this.renderChartComp();
+       setTimeout(() => {this.renderChartComp()},700);
     }
 }
 
@@ -494,6 +547,10 @@ backPage = () => {
 *
 */
 printTable = (data) => {
+
+    if(document.getElementsByClassName('tableStyle')[0]){
+        document.getElementsByClassName('tableStyle')[0].remove();
+    }
         // EXTRACTING THE VALUE FOR HTML HEADER.
         let col = [];
         for (let i = 0; i < data.length; i++) {
