@@ -1,0 +1,40 @@
+.App {
+  text-align: center;
+}
+
+.btn-primary {
+  width: 50%;
+}
+
+.chart-container {
+  text-align: center;
+}
+
+.form-control {
+background-color: #F5F5F5;
+}
+
+.muze-viz {
+  margin: auto;
+}
+
+.close-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.chart-body {
+  margin-top: 1%;
+}
+
+.back-icon {
+  margin-top: 10%;
+  height: 45px;
+  width: 45px;
+}
+
+.back-icon:hover{
+ cursor: pointer;
+}
+
+button:focus {outline:0;}

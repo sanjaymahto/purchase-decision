@@ -1,0 +1,51 @@
+.filter-paragraph{
+    text-align: left;
+    margin-left: 10px;
+    margin-bottom: 1px;
+}
+
+.filter-body{
+    border: solid 1px #0000002e;
+    border-radius: 10px;
+    margin: 0% 0% 3% 0%;
+}
+
+.filter-toggle-btn-field {
+    margin: 5%;
+}
+
+.filter-toggle-btn-operation {
+    margin-left: 7%;
+    margin-top: 4%;
+}
+
+.value-input {
+    width: 20%;
+    margin-left: 1%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.input-group-append {
+    height: 38px;
+}
+
+.btn-filter {
+    margin-top: -7.5%;
+    margin-bottom: 1.5%;
+    margin-left: 77%;
+    height: 39px;
+    width: 22% !important;
+    border-radius: 6px;
+}
+
+.filter-close {
+    margin-top: -0.5%;
+    opacity: 1.0;
+    margin-left: 2.5%;
+}
+
+.filter-dropdown {
+    margin-top: 2%;
+    margin-left: 1%;
+}
