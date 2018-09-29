@@ -291,6 +291,30 @@ filterComparedChart = (field, operation, value) => {
         .width(1000)
         .detail(['Name']) // Show all the data point
         .mount(document.getElementById('compare-chart-container'));
+
+         //defining object for selected data.
+         let selectedData = {};
+        
+         // brush effect in SPLOM Chart
+         const SpawnableSideEffect = muze.SideEffects.standards.SpawnableSideEffect;
+ 
+         muze.ActionModel.for(canvas)
+             .mapSideEffects({
+                 brush: ['table']
+             })
+             .registerSideEffects(
+                 class Table extends SpawnableSideEffect {
+                     static formalName () {
+                         return 'table';
+                     }
+                     apply (selectionSet) {
+                         const model = selectionSet.mergedEnter.model;
+                         const unitId = this.firebolt.context.id();
+                         selectedData[unitId] = model;
+                         let data = updateTableView(selectedData);
+                         dataconverter(data);
+                     }
+                 });
 }
 
 /**
