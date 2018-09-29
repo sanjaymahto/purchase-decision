@@ -224,6 +224,14 @@ filterChart = (field, operation, value) => {
  */
 filterComparedChart = (field, operation, value) => {
 
+    // blocking table-para div paragraph
+    document.getElementsByClassName('table-para')[0].style.display = 'block';
+
+    // to remove any table if already present with the updated one
+    if (document.getElementsByClassName('tableStyle')[0]) {
+        document.getElementsByClassName('tableStyle')[0].remove();
+    }
+
     // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
     let DataModel = muze.DataModel;
     // Create an instance of DataModel using the data and schema.
@@ -341,6 +349,15 @@ clearFilter = () => {
  * function to clear the filter state
  */
 clearCompareFilter = () => {
+
+    // blocking table-para div paragraph
+    document.getElementsByClassName('table-para')[0].style.display = 'block';
+
+    // to remove any table if already present with the updated one
+    if (document.getElementsByClassName('tableStyle')[0]) {
+        document.getElementsByClassName('tableStyle')[0].remove();
+    }
+
     this.setState({
       filterState: null,
       rootData: null
