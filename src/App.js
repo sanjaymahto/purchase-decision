@@ -397,6 +397,8 @@ renderChart = () => {
 */
 renderChartComp = () => {
 
+    document.getElementsByClassName('splom-placeholder')[0].style.display = 'none';
+
     // Defining variable - Canvas instance of rendered chart 
     const crosstab = this.state.chartCanvas;
 

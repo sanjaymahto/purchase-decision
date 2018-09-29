@@ -110,6 +110,11 @@ export function updateTableView (selectedData) {
 *
 */
 function printTable(data) {
+    if (data.length > 0) {
+        document.getElementsByClassName('table-para')[0].style.display = 'none';
+    } else {
+        document.getElementsByClassName('table-para')[0].style.display = 'block';
+    }
     // to remove any table if already present with the updated one
     if (document.getElementsByClassName('tableStyle')[0]) {
         document.getElementsByClassName('tableStyle')[0].remove();
