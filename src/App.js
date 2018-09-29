@@ -287,7 +287,7 @@ filterComparedChart = (field, operation, value) => {
         .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs'])
         .columns(['Miles_per_Gallon', 'Horsepower', 'Weight_in_lbs'])
         .data(rootData)
-        .height(600)
+        .height(700)
         .width(1000)
         .detail(['Name']) // Show all the data point
         .mount(document.getElementById('compare-chart-container'));
@@ -417,7 +417,7 @@ renderChartComp = () => {
         .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs'])
         .columns(['Miles_per_Gallon', 'Horsepower', 'Weight_in_lbs'])
         .data(crosstabData)
-        .height(600)
+        .height(700)
         .width(1000)
         .detail(['Name']) // Show all the data point
         .mount(document.getElementById('compare-chart-container'));
