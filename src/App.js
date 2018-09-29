@@ -3,6 +3,7 @@ import SortingComponent from './sort/index';
 import FilterComponent from './filter/index';
 import CompareComponent from './compare/index';
 import { DATA, SCHEMA } from './constants';
+import { selectedFields, updateTableView, dataconverter } from './utils';
 import './App.css';
 
 /* global muze */
@@ -51,17 +52,17 @@ componentDidMount() {
 */
 sortedChart = (field, sortValue) => {
     
- //defining root Data
- let rootData;   
+   //defining root Data
+    let rootData;   
 
   // load data and schema from constants file
-  const data = DATA;
-  const schema = SCHEMA;
+    const data = DATA;
+    const schema = SCHEMA;
 
- // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
- let DataModel = muze.DataModel;
+  // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
+    let DataModel = muze.DataModel;
  
-    // Create an instance of DataModel using the data and schema.
+  // Create an instance of DataModel using the data and schema.
     if(this.state.rootData !== null){
         rootData = this.state.rootData;
     } else {
@@ -223,10 +224,6 @@ filterChart = (field, operation, value) => {
  */
 filterComparedChart = (field, operation, value) => {
 
-    // load data and schema from url
-    const data = DATA;
-    const schema = SCHEMA;
-
     // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
     let DataModel = muze.DataModel;
     // Create an instance of DataModel using the data and schema.
@@ -332,7 +329,8 @@ clearCompareFilter = () => {
 renderChart = () => {
     
     if(this.state.sortState !== null) {
-        this.sortedChart(this.state.sortState.sortfield, this.state.sortState.sortValue);
+        this.sortedChart(this.state.sortState.sortfield,
+        this.state.sortState.sortValue);
     } else {
         if(this.state.filterState !== null){
             this.filterChart(this.state.filterState.filterField, 
@@ -360,9 +358,11 @@ renderChart = () => {
     .height(600)
     .mount('#chart-container') // Set the chart mount point
 
+    // setting chartCanvas State
     this.setState({
-        chartCanvas:canvas
-    });
+            chartCanvas:canvas
+        });
+
         }
     }
 }
@@ -372,32 +372,12 @@ renderChart = () => {
 * @param  {Array} fields - charting field array
 */
 renderChartComp = () => {
+
     // Defining variable - Canvas instance of rendered chart 
     const crosstab = this.state.chartCanvas;
 
-    // Array of selected fields
-    let selectedModels = [];
-    crosstab.composition().visualGroup.matrixInstance().value.each((cell) => {
-        const firebolt = cell.valueOf().firebolt();
-        // @todo Change ._entryExitSet to getEntryExitSet after getting new build
-        const entryExitSet = cell.valueOf().firebolt()._entryExitSet;
-        const selectedModel = entryExitSet.select.mergedEnter.model;
-        selectedModels.push(selectedModel.project(selectedModel.getSchema().filter(d => d.type === 'dimension')
-                .map(d => d.name)));
-    });
-
-    const crosstabData =  crosstab.composition().visualGroup.data().select((fields) => {
-        return selectedModels.some((model) => {
-            let dataObj = model.getData();
-            let data = dataObj.data;
-            return dataObj.data.some((d, rIdx) => {
-                return dataObj.schema.every((d, cIdx) => {
-                    return fields[d.name].value === data[rIdx][cIdx];
-                });
-            })
-        });
-    });
-
+    // defining variable to get the selected point from SPLOM chart
+    const crosstabData = selectedFields(crosstab);
 
     // storing crosstab data in the state
     this.setState({
@@ -418,72 +398,12 @@ renderChartComp = () => {
         .detail(['Name']) // Show all the data point
         .mount(document.getElementById('compare-chart-container'));
 
+        //defining object for selected data.
+        let selectedData = {};
+        
         // brush effect in SPLOM Chart
         const SpawnableSideEffect = muze.SideEffects.standards.SpawnableSideEffect;
 
-        let selectedData = {};
-
-        const concatModels = (dm1, dm2) => {
-            const dataObj1 = dm1.getData();
-            const dataObj2 = dm2.getData();
-            const data1 = dataObj1.data;
-            const data2 = dataObj2.data;
-            const schema1 = dataObj1.schema;
-            const schema2 = dataObj2.schema;
-            const tuples1 = {};
-            const tuples2 = {};
-            const commonTuples = {};
-            for (let i = 0; i < data1.length; i++) {
-                for (let ii = 0; ii < data2.length; ii++) {
-                    const row1 = data1[i];
-                    const row2 = data2[ii];
-                    const dim1Values = row1.filter((d, idx) => schema1[idx].type === 'dimension');
-                    const dim2Values = row2.filter((d, idx) => schema2[idx].type === 'dimension');
-                    const allDimSame = dim1Values.every(value => dim2Values.indexOf(value) !== -1);
-                    if (allDimSame) {
-                        const key = dim1Values.join();
-                        !commonTuples[key] && (commonTuples[key] = {});
-                        row1.forEach((value, idx) => {
-                            commonTuples[key][schema1[idx].name] = value;
-                        });
-                        row2.forEach((value, idx) => {
-                            commonTuples[key][schema2[idx].name] = value;
-                        });
-                    } else {
-                        const dm1Key = dim1Values.join();
-                        const dm2Key = dim2Values.join();
-                        if (!commonTuples[dm1Key] && !commonTuples[dm2Key]) {
-                            !tuples1[dm1Key] && (tuples1[dm1Key] = {});
-                            !tuples2[dm2Key] && (tuples2[dm2Key] = {});
-                            row1.forEach((value, idx) => {
-                                tuples1[dm1Key][schema1[idx].name] = value;
-                            });
-                            row2.forEach((value, idx) => {
-                                tuples2[dm2Key][schema2[idx].name] = value;
-                            });
-                        }
-                    }
-                }
-            }
-    
-            const commonSchema = [...schema1, ...schema2.filter(s2 => schema1.findIndex(s1 => s1.name === s2.name) === -1)];
-            const dataArr = [...Object.values(tuples1), ...Object.values(tuples2), ...Object.values(commonTuples)];
-            return new DataModel(dataArr, commonSchema);
-        };
-    
-        const updateTableView = (selectedData) => {
-            let model = null;
-            Object.values(selectedData).forEach((dataModel) => {
-                if (model !== null) {
-                    model = concatModels(dataModel, model);
-                } else {
-                    model = dataModel;
-                }
-            });
-
-            this.dataconverter(model);
-        };
-        
         muze.ActionModel.for(canvas)
             .mapSideEffects({
                 brush: ['table']
@@ -497,7 +417,8 @@ renderChartComp = () => {
                         const model = selectionSet.mergedEnter.model;
                         const unitId = this.firebolt.context.id();
                         selectedData[unitId] = model;
-                        updateTableView(selectedData);
+                        let data = updateTableView(selectedData);
+                        dataconverter(data);
                     }
                 });
 
@@ -537,80 +458,6 @@ toggleModal = () => {
  */
 backPage = () => {
     this.toggleModal();
-}
-
- /**
-* This function is used to print the data in table format.
-*
-* @param {data} data in JSON format.
-* @param {config} config The config object.
-*
-*/
-printTable = (data) => {
-
-    if(document.getElementsByClassName('tableStyle')[0]){
-        document.getElementsByClassName('tableStyle')[0].remove();
-    }
-        // EXTRACTING THE VALUE FOR HTML HEADER.
-        let col = [];
-        for (let i = 0; i < data.length; i++) {
-            for (let key in data[i]) {
-                if (col.indexOf(key) === -1) {
-                    col.push(key);
-                }
-            }
-        }
-
-        // CREATING DYNAMIC TABLE.
-        let table = document.createElement('table');
-        table.classList.add('tableStyle');
-
-        // CREATING HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
-        let tr = table.insertRow(-1); // TABLE ROW.
-
-        for (let i = 0; i < col.length; i++) {
-            let th = document.createElement('th'); // TABLE HEADER.
-            th.innerText = col[i];
-            tr.appendChild(th);
-        }
-
-        // ADDING JSON DATA TO THE TABLE AS ROWS.
-        for (let i = 0; i < data.length; i++) {
-            tr = table.insertRow(-1);
-
-            for (let j = 0; j < col.length; j++) {
-                const val = data[i][col[j]];
-                const tabCell = tr.insertCell(-1);
-                tabCell.innerText = (typeof val === 'undefined' ? '' : val);
-            }
-        }
-
-        const tableElem = document.getElementById('table-body');
-        tableElem.appendChild(table);
-}
-
-/**
- * function to convert the tree data to flat data
- * @param {Object} data - tree data of selected fields
- */
-dataconverter = (dataModel) => {
-    let dataObj = dataModel.getData();
-    let data = dataObj.data;
-    let schema = dataObj.schema;
-
-    let dataArray = [];
-
-    for (let i = 0; i < data.length; i += 1) {
-        let tuple = data[i];
-        let temp = {};
-        for (let j = 0; j < tuple.length; j += 1) {
-            let name = schema[j].name;
-            let value = tuple[j];
-            temp[name] = value;
-        }
-        dataArray.push(temp);
-    }
-   this.printTable(dataArray);
 }
 
 /**
