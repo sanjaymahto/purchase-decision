@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import SortingComponent from './sort/index';
 import FilterComponent from './filter/index';
 import CompareComponent from './compare/index';
 import { DATA, SCHEMA } from './constants';
@@ -550,11 +549,11 @@ render() {
                 </div>
                 :
                 <div className="row">
-                    <div className="col-4">
-                        <SortingComponent 
+                    <div className="col-2">
+                        {/* <SortingComponent 
                         sort={this.sortedChart}
                         clearSort={this.clearSort}
-                        render={this.renderChart}/>
+                        render={this.renderChart}/> */}
                     </div>
                     <div className="col-8">
                     <FilterComponent

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-// import { DATA } from '../constants';
 import './filter.css';
 
 /**
@@ -28,28 +27,54 @@ class FilterComponent extends Component {
         };
     }
 
+    /**
+     * function to set selection state
+     *
+     * @param  {Object} event - selection event
+     */
     setSelection = (event) => {
         this.setState({
             selectedField: event.target.value
         });
     }
 
+    /**
+     * function to set operation event
+     *
+     * @param  {Object} event - Object Event
+     */
     setOperation = (event) => {
         this.setState({
             selectedOperation: event.target.value
         });
     }
 
+    /**
+     * function to set selected value
+     *
+     * @param  {Object} event - set selected value
+     */
     setValue = (event) => {
         this.setState({
             selectedvalue: event.target.value
         });
     }
 
+    /**
+     * function to filter chart
+     *
+     * @param  {string} =>{this.props.filter(this.state.selectedField
+     * @param  {string} this.state.selectedOperation - selected Operation
+     * @param  {string} this.state.selectedvalue - selected value
+     */
     filterChart = () => {
         this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedvalue);
     }
 
+    /**
+     * function to reset filtering
+     *
+     */
     resetFiltering = () => {
         this.selectField.current.selectedIndex = 0;
         this.selectedOperation.current.selectedIndex = 0;
@@ -74,7 +99,6 @@ class FilterComponent extends Component {
     render() {
         return (
             <div className="filter-component">
-                <p className="filter-paragraph">FILTER</p>
                 <div className="row filter-body">
                     <div className="dropdown filter-dropdown">
                         <select

@@ -1,13 +1,8 @@
-.filter-paragraph{
-    text-align: left;
-    margin-left: 10px;
-    margin-bottom: 1px;
-}
 
 .filter-body{
     border: solid 1px #0000002e;
     border-radius: 10px;
-    margin: 0% 0% 3% 0%;
+    margin: 2% 2% 3% 0%;
 }
 
 .filter-toggle-btn-field {
