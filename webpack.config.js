@@ -9,7 +9,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, outputDirectory),
         filename: 'bundle.js',
-        publicPath: '/'
+        publicPath: '/purchase-decision'
     },
     module: {
         rules: [
@@ -28,9 +28,11 @@ module.exports = {
         ]
     },
     devServer: {
+        // publicPath: 'http://localhost:8080/purchase-decision',
         historyApiFallback: true,
         host: 'localhost',
         open: true,
+        openPage: 'purchase-decision'
     },
     plugins: [
         new CleanWebpackPlugin([outputDirectory]),
