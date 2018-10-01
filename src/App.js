@@ -131,55 +131,32 @@ filterChart = (field, operation, value) => {
  let DataModel = muze.DataModel;
 
  // Create an instance of DataModel using the data and schema.
- if(this.state.rootData !== null){
-    rootData = this.state.rootData;
- } else {
+//  if(this.state.rootData !== null){
+//     rootData = this.state.rootData;
+//  } else {
+//     rootData = new DataModel(data, schema);
+//  }
+
     rootData = new DataModel(data, schema);
- }
 
  //sorting function to sort chart
  const select = DataModel.Operators.select;
 
     switch(operation) {
         case 'lessThan' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value < value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value < value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value < value);
+        rootData = rootData.select((fields, i) => fields[field].value < value);
         break;
         case 'greaterThan' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value > value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value > value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value > value);
+        rootData = rootData.select((fields, i) => fields[field].value > value);
         break;
         case 'equalTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value == value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value == value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value == value);
+        rootData = rootData.select((fields, i) => fields[field].value == value);
         break;
         case 'lessThanEqualTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value <= value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value <= value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value <= value);
+        rootData = rootData.select((fields, i) => fields[field].value <= value);
         break;
         case 'greaterThanEqualTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value >= value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value >= value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value >= value);
+        rootData = rootData.select((fields, i) => fields[field].value >= value);
         break;
         default : 
         rootData = rootData;
@@ -246,44 +223,19 @@ filterComparedChart = (field, operation, value) => {
 
     switch(operation) {
         case 'lessThan' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value < value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value < value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value < value);
+        rootData = rootData.select((fields, i) => fields[field].value < value);
         break;
         case 'greaterThan' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value > value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value > value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value > value);
+        rootData = rootData.select((fields, i) => fields[field].value > value);
         break;
         case 'equalTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value == value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value == value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value == value);
+        rootData = rootData.select((fields, i) => fields[field].value == value);
         break;
         case 'lessThanEqualTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value <= value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value <= value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value <= value);
+        rootData = rootData.select((fields, i) => fields[field].value <= value);
         break;
         case 'greaterThanEqualTo' : 
-        if(field === 'Horsepower')
-        rootData = rootData.select((fields, i) => fields.Horsepower.value >= value);
-        if(field === 'Miles_per_Gallon')
-        rootData = rootData.select((fields, i) => fields.Miles_per_Gallon.value >= value);
-        if(field === 'Weight_in_lbs')
-        rootData = rootData.select((fields, i) => fields.Weight_in_lbs.value >= value);
+        rootData = rootData.select((fields, i) => fields[field].value >= value);
         break;
         default : 
         rootData = rootData;
