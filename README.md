@@ -21,13 +21,13 @@ NPM
 ```
   running project:
 ```
-     Run `npm run build` command to run webpack to create a build.
+  Run `npm run build` command to run webpack to create a build.
 ```
 
 or
 
 ```
-   `npm start` to start the dev server.
+  Run `npm start` to start the dev server.
 ```
 
 ##Result Image 
