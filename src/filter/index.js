@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './filter.css';
 
+
+/* eslint no-undef:0 */
 /**
  * The component to sort sample data
  *
@@ -19,11 +21,13 @@ class FilterComponent extends Component {
         this.selectField = React.createRef();
         this.selectedOperation = React.createRef();
         this.selectedValue = React.createRef();
+        this.selectedAppendValue = React.createRef();
         this.fieldArray = ['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs'];
         this.state = {
             selectedField: null,
             selectedOperation: null,
-            selectedvalue: null
+            selectedvalue: null,
+            selectedAppendValue: '.00'
         };
     }
 
@@ -60,6 +64,25 @@ class FilterComponent extends Component {
         });
     }
 
+
+    /**
+     * function to set selected Append value
+     *
+     * @param  {Object} event - set selected value
+     */
+    setAppendValue = (event) => {
+        if ((event.target.value).indexOf('.') === -1 && event.target.value !== '') {
+            alert("Invalid data! should be in the format '.00'");
+            this.selectedAppendValue.current.value = '';
+        } else {
+            let value = this.state.selectedvalue + event.target.value;
+            this.setState({
+                selectedAppendValue: value
+            });
+        }
+    }
+
+
     /**
      * function to filter chart
      *
@@ -68,7 +91,13 @@ class FilterComponent extends Component {
      * @param  {string} this.state.selectedvalue - selected value
      */
     filterChart = () => {
-        this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedvalue);
+        if (this.state.selectedAppendValue === '.00' ||
+         !(this.state.selectedAppendValue).includes(this.state.selectedvalue))
+        {
+            this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedvalue);
+        } else {
+            this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedAppendValue);
+        }
     }
 
     /**
@@ -79,11 +108,13 @@ class FilterComponent extends Component {
         this.selectField.current.selectedIndex = 0;
         this.selectedOperation.current.selectedIndex = 0;
         this.selectedValue.current.value = '';
+        this.selectedAppendValue.current.value = '';
         this.props.clearFilter();
         this.setState({
             selectedField: null,
             selectedOperation: null,
-            selectedvalue: null
+            selectedvalue: null,
+            selectedAppendValue: '.00'
         });
         setTimeout(() => {
             this.props.render();
@@ -133,11 +164,16 @@ class FilterComponent extends Component {
                             ref={this.selectedValue}
                             type="text"
                             className="form-control"
+                            placeholder="00"
                             onChange={event => this.setValue(event)}
                         />
-                        <div className="input-group-append">
-                            <span className="input-group-text">.00</span>
-                        </div>
+                        <input
+                            ref={this.selectedAppendValue}
+                            type="text"
+                            className="form-control"
+                            placeholder=".00"
+                            onChange={event => this.setAppendValue(event)}
+                        />
                     </div>
                     <button
                         type="button"

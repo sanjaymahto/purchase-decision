@@ -40,6 +40,10 @@
     margin-left: 2.5%;
 }
 
+.form-control {
+    text-align: center;
+}
+
 .filter-dropdown {
     margin-top: 2%;
     margin-left: 1%;

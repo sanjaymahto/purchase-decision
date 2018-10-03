@@ -32,7 +32,8 @@ constructor(props) {
       rootData: null,
       chartCanvas: null,
       canvasRootData: null,
-      tableCanvas: null
+      tableCanvas: null,
+      prevState: null
     };
 }
 
@@ -120,8 +121,14 @@ sortedChart = (field, sortValue) => {
  */
 filterChart = (field, operation, value) => {
     
-  //defining rootData
-  let rootData;
+   //setting state for the previous chart
+   this.setState({
+       prevState: {
+           field: field,
+           operation: operation,
+           value:value
+       }
+   }) 
   
   // load data and schema from constants file
   const data = DATA;
@@ -130,14 +137,8 @@ filterChart = (field, operation, value) => {
  // Retrieves the DataModel from muze namespace. Muze recognizes DataModel as a first class source of data.
  let DataModel = muze.DataModel;
 
- // Create an instance of DataModel using the data and schema.
-//  if(this.state.rootData !== null){
-//     rootData = this.state.rootData;
-//  } else {
-//     rootData = new DataModel(data, schema);
-//  }
-
-    rootData = new DataModel(data, schema);
+ //to set the rootData 
+ let rootData = new DataModel(data, schema);
 
  //sorting function to sort chart
  const select = DataModel.Operators.select;
@@ -163,23 +164,24 @@ filterChart = (field, operation, value) => {
         break;
     }
 
-    //setting the state
-    this.setState({
-        filterState: {
-        filterField: field,
-        filterOperation: operation,
-        filterValue: value
-        },
-        rootData: rootData
-    });
+        //setting the state
+        this.setState({
+            prevState: {
+            field: field,
+            operation: operation,
+            filterValue: value.split('.')[0],
+            filterAppendValue: '.'+value.split('.')[1]
+            },
+            rootData: rootData
+        });
         // Create an environment for future rendering
         const env = muze();
         // Create an instance of canvas which houses the visualization
         const canvas = env.canvas();
 
         canvas
-        .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs']) // Horsepower goes in Y aix
-        .columns(['Maker']) // Year goes in X axis
+        .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs']) 
+        .columns(['Maker'])
         .data(rootData)
         .width(1000)
         .height(600)
@@ -195,7 +197,7 @@ filterChart = (field, operation, value) => {
  * function to filter the compared chart
  *
  * @param  {string} field
- * @param  {string} operation
+ * @param  {string} operationh
  * @param  {string} value
  */
 filterComparedChart = (field, operation, value) => {
@@ -244,7 +246,7 @@ filterComparedChart = (field, operation, value) => {
 
     canvas = canvas
         .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs'])
-        .columns(['Miles_per_Gallon', 'Horsepower', 'Weight_in_lbs'])
+        .columns(['Weight_in_lbs', 'Miles_per_Gallon', 'Horsepower'])
         .data(rootData)
         .height(700)
         .width(1000)
@@ -291,6 +293,7 @@ clearSort = () => {
  */
 clearFilter = () => {
   this.setState({
+    prevState:null,
     filterState: null,
     rootData: null
   });
@@ -385,7 +388,7 @@ renderChartComp = () => {
 
     canvas = canvas
         .rows(['Horsepower', 'Miles_per_Gallon', 'Weight_in_lbs'])
-        .columns(['Miles_per_Gallon', 'Horsepower', 'Weight_in_lbs'])
+        .columns(['Weight_in_lbs', 'Miles_per_Gallon', 'Horsepower'])
         .data(crosstabData)
         .height(700)
         .width(1000)
@@ -428,8 +431,26 @@ toggleModal = () => {
        this.setState({
            showModal: false
        });
+
+       setTimeout(()=> {
+           if(this.state.prevState){
+        this.clearComponent.current.selectField.current.value = this.state.prevState.field || '';
+        this.clearComponent.current.selectedOperation.current.value = this.state.prevState.operation || '';
+        this.clearComponent.current.selectedValue.current.value = this.state.prevState.filterValue;
+        this.clearComponent.current.selectedAppendValue.current.value = this.state.prevState.filterAppendValue;
+
+        //setting state in the filter component
+         this.clearComponent.current.state.selectedField = this.state.prevState.field;
+         this.clearComponent.current.state.selectedOperation = this.state.prevState.operation;
+         this.clearComponent.current.state.selectedValue = this.state.prevState.filterValue;
+         this.clearComponent.current.state.selectedAppendValue = this.state.prevState.filterValue + this.state.prevState.filterAppendValue;
+           }
+       },500);
+
+
+      
        //to reset the filter component
-       this.clearCompareComponent.current.resetFiltering();
+    //    this.clearCompareComponent.current.resetFiltering();
        
 
     } else {
@@ -440,7 +461,7 @@ toggleModal = () => {
        });
 
      //to reset the filter component
-     this.clearComponent.current.resetFiltering();        
+    //  this.clearComponent.current.resetFiltering();        
 
         //render the compare chart
        setTimeout(() => {this.renderChartComp()},700);
