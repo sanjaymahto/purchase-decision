@@ -28,7 +28,6 @@ module.exports = {
         ]
     },
     devServer: {
-        // publicPath: 'http://localhost:8080/purchase-decision',
         historyApiFallback: true,
         host: 'localhost',
         open: true,
