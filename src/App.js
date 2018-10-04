@@ -484,6 +484,12 @@ backPage = () => {
 render() {
     return (
         <div className="App">
+        <a href="https://github.com/sanjaymahto/purchase-decision" target="_blank">
+        <img style={{position: 'absolute', top: '-16px', right: '-20px', border: 0}} src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub" />
+        </a>
+        <div className="github-ribbon">
+        <a className="github-ribbon__link" href="https://charts.com" title="Fork me on GitHub" target="_blank">Go to charts.com</a>
+        </div>
             <div className="container">
                 { this.state.showModal ?
                 <div className="row">
