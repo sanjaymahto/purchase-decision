@@ -165,9 +165,6 @@ filterChart = (field, operation, value) => {
         break;
     }
 
-    if(rootData.getData().data.length === 0) {
-        alert('field with this value is not present in the chart!');
-    }
 
         //setting the state
         this.setState({
@@ -247,10 +244,6 @@ filterComparedChart = (field, operation, value) => {
         default : 
         rootData = rootData;
         break;
-    }
-
-    if(rootData.getData().data.length === 0) {
-        alert('field with this value is not present in the chart!');
     }
 
     canvas = canvas
