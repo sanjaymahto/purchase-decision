@@ -91,12 +91,21 @@ class FilterComponent extends Component {
      * @param  {string} this.state.selectedvalue - selected value
      */
     filterChart = () => {
+        let dm = this.props.filteringRootData;
+        let domainRange = dm.getFieldspace().fieldsObj()[this.state.selectedField].domain();
         if (this.state.selectedAppendValue === '.00' ||
          !(this.state.selectedAppendValue).includes(this.state.selectedvalue))
         {
-            this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedvalue);
-        } else {
+            if (this.state.selectedvalue >= domainRange[0] && this.state.selectedvalue <= domainRange[1]) {
+                this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedvalue);
+            } else {
+                alert('value is not in domain Range');
+            }
+        } else if (this.state.selectedAppendValue >= domainRange[0] &&
+            this.state.selectedAppendValue <= domainRange[1]) {
             this.props.filter(this.state.selectedField, this.state.selectedOperation, this.state.selectedAppendValue);
+        } else {
+            alert('value is not in domain Range');
         }
     }
 
@@ -230,7 +239,8 @@ class FilterComponent extends Component {
 FilterComponent.propTypes = {
     filter: PropTypes.func.isRequired,
     clearFilter: PropTypes.func.isRequired,
-    render: PropTypes.func.isRequired
+    render: PropTypes.func.isRequired,
+    filteringRootData: PropTypes.objectOf.isRequired
 };
 
 

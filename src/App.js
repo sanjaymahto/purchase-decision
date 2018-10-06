@@ -30,6 +30,7 @@ constructor(props) {
       filterState: null,
       showModal: false,
       rootData: null,
+      filteringRootData: null,
       chartCanvas: null,
       canvasRootData: null,
       tableCanvas: null,
@@ -164,6 +165,10 @@ filterChart = (field, operation, value) => {
         break;
     }
 
+    if(rootData.getData().data.length === 0) {
+        alert('field with this value is not present in the chart!');
+    }
+
         //setting the state
         this.setState({
             prevState: {
@@ -242,6 +247,10 @@ filterComparedChart = (field, operation, value) => {
         default : 
         rootData = rootData;
         break;
+    }
+
+    if(rootData.getData().data.length === 0) {
+        alert('field with this value is not present in the chart!');
     }
 
     canvas = canvas
@@ -339,6 +348,11 @@ renderChart = () => {
 
     // Create an instance of DataModel using the data and schema.
     let dm = new muze.DataModel(data, schema);
+
+    //storing root data for filter purpose
+    this.setState({
+        filteringRootData: dm
+    })
   
   	// Create an environment for future rendering
     const env = muze();
@@ -378,7 +392,8 @@ renderChartComp = () => {
 
     // storing crosstab data in the state
     this.setState({
-        canvasRootData: crosstabData
+        canvasRootData: crosstabData,
+        filteringRootData: crosstabData
     })
 
     // Create an environment for future rendering
@@ -520,6 +535,7 @@ render() {
                     <div className="col-8">
                     <FilterComponent
                         ref={this.clearCompareComponent}
+                        filteringRootData={this.state.filteringRootData}
                         filter={this.filterComparedChart}
                         clearFilter={this.clearCompareFilter}
                         render={this.renderChartComp}
@@ -537,6 +553,7 @@ render() {
                     <div className="col-8">
                     <FilterComponent
                         ref={this.clearComponent}
+                        filteringRootData={this.state.filteringRootData}
                         filter={this.filterChart}
                         clearFilter={this.clearFilter}
                         render={this.renderChart}/>
